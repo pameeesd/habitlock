@@ -1,0 +1,23 @@
+import UIKit
+
+/// Lanzador del esquema de URLs de la app Atajos (Shortcuts) para actualizar el fondo de pantalla de bloqueo.
+struct ShortcutLauncher {
+    
+    /// Ejecuta el atajo nativo especificado pasando la imagen del portapapeles
+    static func launchShortcut(named shortcutName: String = AppConstants.defaultShortcutName) {
+        let urlString = "\(AppConstants.shortcutsURLScheme)\(shortcutName)&input=clipboard"
+        
+        guard let encodedUrlString = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let url = URL(string: encodedUrlString) else {
+            return
+        }
+        
+        DispatchQueue.main.async {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            } else {
+                print("No se pudo abrir la URL del atajo: \(encodedUrlString)")
+            }
+        }
+    }
+}

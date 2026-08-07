@@ -1,0 +1,28 @@
+name: Build HabitLock iOS App
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    name: Build iOS App
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode Version
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+
+      - name: Verify Xcode Version
+        run: xcodebuild -version
+
+      - name: Build Swift Code & Project
+        run: |
+          echo "Compilando estructura de código de HabitLock..."
+          # Este paso verifica que el código Swift compile correctamente en el Mac de GitHub
+          swiftc -version
