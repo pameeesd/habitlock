@@ -17,6 +17,8 @@ targets:
     platform: iOS
     sources:
       - path: HabitLock
+        excludes:
+          - "Resources/Info.plist"
     dependencies:
       - target: HabitLockWidget
     settings:
@@ -30,6 +32,8 @@ targets:
     platform: iOS
     sources:
       - path: HabitLockWidget
+        excludes:
+          - "Info.plist"
       - path: HabitLock/Models
       - path: HabitLock/Services
       - path: HabitLock/Theme
@@ -39,5 +43,6 @@ targets:
           - "HabitLockApp.swift"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.tuempresa.habitlock.widget
-      GENERATE_INFOPLIST_FILE: true
+      INFOPLIST_FILE: HabitLockWidget/Info.plist
+      GENERATE_INFOPLIST_FILE: false
       SWIFT_VERSION: "5.0"
