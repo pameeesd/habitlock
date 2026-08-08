@@ -1,4 +1,4 @@
-name: Build HabitLock iOS App (.ipa)
+name: Diagnostic & Unsigned iOS Build
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build & Package iOS App
+    name: Build & Diagnostic (iphoneos)
     runs-on: macos-14
 
     steps:
@@ -18,39 +18,69 @@ jobs:
       - name: Select Xcode Version
         run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
 
-      - name: Verify Xcode Version
-        run: xcodebuild -version
+      - name: Print Xcode and Swift versions
+        run: |
+          xcodebuild -version
+          swift --version
 
-      - name: Install XcodeGen
-        run: brew install xcodegen || true
+      - name: List Available SDKs
+        run: xcodebuild -showsdks
 
-      - name: Generate Xcode Project
+      - name: Install XcodeGen if missing
+        run: |
+          if ! command -v xcodegen &> /dev/null; then
+            brew install xcodegen
+          else
+            echo "XcodeGen is already installed."
+          fi
+
+      - name: Generate Xcode Project with XcodeGen
         run: xcodegen generate
 
-      - name: Build Unsigned iOS App
+      - name: Verify HabitLock.xcodeproj existence
         run: |
-          xcodebuild -project HabitLock.xcodeproj -target HabitLock -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO SYMROOT=build build || \
-          xcodebuild -project HabitLock.xcodeproj -target HabitLock -configuration Release -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO SYMROOT=build build
-
-      - name: Create Payload Folder for IPA
-        run: |
-          mkdir -p Payload
-          if [ -d "build/Release-iphonesimulator/HabitLock.app" ]; then
-            cp -r build/Release-iphonesimulator/HabitLock.app Payload/
-            zip -r HabitLock.ipa Payload
-          elif [ -d "build/Release-iphoneos/HabitLock.app" ]; then
-            cp -r build/Release-iphoneos/HabitLock.app Payload/
-            zip -r HabitLock.ipa Payload
+          if [ -d "HabitLock.xcodeproj" ]; then
+            echo "HabitLock.xcodeproj successfully generated."
           else
-            echo "Directorio de compilación no encontrado."
+            echo "Error: HabitLock.xcodeproj was not generated."
             exit 1
           fi
 
-      - name: Upload IPA Artifact
+      - name: List Xcode Project Targets and Schemes
+        run: xcodebuild -list -project HabitLock.xcodeproj
+
+      - name: Build HabitLock Target for iphoneos (Unsigned)
+        run: |
+          xcodebuild -project HabitLock.xcodeproj \
+            -target HabitLock \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM="" \
+            SYMROOT=build \
+            build
+
+      - name: Verify Output App Bundle Existence
+        run: |
+          if [ -d "build/Release-iphoneos/HabitLock.app" ]; then
+            echo "Build Succeeded: build/Release-iphoneos/HabitLock.app exists."
+          else
+            echo "Error: build/Release-iphoneos/HabitLock.app does not exist."
+            exit 1
+          fi
+
+      - name: Package Diagnostic Unsigned IPA
+        run: |
+          mkdir -p Payload
+          cp -r build/Release-iphoneos/HabitLock.app Payload/
+          zip -r HabitLock-unsigned.ipa Payload
+
+      - name: Upload Unsigned Diagnostic IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: HabitLock-iOS-IPA
-          path: |
-            HabitLock.ipa
-            Payload/
-          if-no-files-found: ignore
+          name: HabitLock-unsigned-ipa
+          path: HabitLock-unsigned.ipa
+          if-no-files-found: error

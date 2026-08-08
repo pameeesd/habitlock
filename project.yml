@@ -19,6 +19,8 @@ targets:
       - path: HabitLock
         excludes:
           - "Resources/Info.plist"
+    dependencies:
+      - target: HabitLockWidget
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.tuempresa.habitlock
       INFOPLIST_FILE: HabitLock/Resources/Info.plist
@@ -34,6 +36,9 @@ targets:
           - "Info.plist"
       - path: HabitLock/Models
       - path: HabitLock/Services
+        excludes:
+          - "ShortcutLauncher.swift"
+          - "WallpaperGenerator.swift"
       - path: HabitLock/Theme
       - path: HabitLock/Intents
       - path: HabitLock/App
@@ -43,4 +48,5 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.tuempresa.habitlock.widget
       INFOPLIST_FILE: HabitLockWidget/Info.plist
       GENERATE_INFOPLIST_FILE: false
+      APPLICATION_EXTENSION_API_ONLY: true
       SWIFT_VERSION: "5.0"
