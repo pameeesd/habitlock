@@ -1,33 +1,39 @@
 import Foundation
 import SwiftData
-import CoreData
 
-/// Controlador de persistencia compartido para App y Extensiones de Widget.
-/// Configura el contenedor seguro del App Group y habilita cifrado por hardware en SQLite.
-class PersistenceController {
-    static let shared = PersistenceController()
-    
-    /// Contenedor de SwiftData para iOS 17+
-    let sharedModelContainer: ModelContainer
-    
-    private init() {
+/// Extension para inicializar el contenedor compartido de SwiftData apuntando al App Group.
+extension ModelContainer {
+    public static var sharedContainer: ModelContainer = {
         let schema = Schema([
+            Habit.self,
             HabitTask.self
         ])
         
+        let appGroupIdentifier = AppConstants.appGroupIdentifier
         guard let sharedContainerURL = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: AppConstants.appGroupIdentifier
+            forSecurityApplicationGroupIdentifier: appGroupIdentifier
         ) else {
-            fatalError("No se pudo acceder al contenedor compartido del App Group: \(AppConstants.appGroupIdentifier)")
+            fatalError("No se pudo crear o acceder al App Group compartido: \(appGroupIdentifier)")
         }
         
         let storeURL = sharedContainerURL.appendingPathComponent(AppConstants.databaseFilename)
-        let modelConfiguration = ModelConfiguration(url: storeURL)
+        let config = ModelConfiguration(url: storeURL)
         
         do {
-            self.sharedModelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
+            return try ModelContainer(for: schema, configurations: [config])
         } catch {
-            fatalError("Error al inicializar el ModelContainer de SwiftData: \(error)")
+            fatalError("Error al instanciar el contenedor compartido de SwiftData: \(error.localizedDescription)")
         }
+    }()
+}
+
+/// Controlador de persistencia compartido para compatibilidad y acceso global.
+class PersistenceController {
+    static let shared = PersistenceController()
+    
+    let sharedModelContainer: ModelContainer
+    
+    private init() {
+        self.sharedModelContainer = ModelContainer.sharedContainer
     }
 }

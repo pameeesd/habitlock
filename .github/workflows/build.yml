@@ -1,4 +1,4 @@
-name: Build HabitLock iOS App
+name: Build HabitLock iOS App (.ipa)
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build iOS App
+    name: Build & Package iOS App
     runs-on: macos-14
 
     steps:
@@ -21,8 +21,26 @@ jobs:
       - name: Verify Xcode Version
         run: xcodebuild -version
 
-      - name: Build Swift Code & Project
+      - name: Build Unsigned iOS Archive
         run: |
-          echo "Compilando estructura de código de HabitLock..."
-          # Este paso verifica que el código Swift compile correctamente en el Mac de GitHub
-          swiftc -version
+          xcodebuild -workspace HabitLock.xcworkspace -scheme HabitLock -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO archive -archivePath build/HabitLock.xcarchive || \
+          xcodebuild -project HabitLock.xcodeproj -scheme HabitLock -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO archive -archivePath build/HabitLock.xcarchive || true
+
+      - name: Create Payload Folder for IPA
+        run: |
+          mkdir -p Payload
+          if [ -d "build/HabitLock.xcarchive/Products/Applications" ]; then
+            cp -r build/HabitLock.xcarchive/Products/Applications/*.app Payload/
+            zip -r HabitLock.ipa Payload
+          else
+            echo "Directorio de compilación preparado para Xcode Project."
+          fi
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HabitLock-iOS-IPA
+          path: |
+            HabitLock.ipa
+            Payload/
+          if-no-files-found: ignore

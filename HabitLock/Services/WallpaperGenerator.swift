@@ -2,7 +2,10 @@ import SwiftUI
 import Photos
 import UIKit
 
-/// Servicio de captura y exportación de fondos de pantalla para Lock Screen usando ImageRenderer.
+/// [DEPRECATED / FUERA DE ALCANCE]
+/// Servicio heredado para exportación de fondos de pantalla.
+/// La generación de fondos de pantalla/wallpapers fue excluida del alcance de HabitLock en favor de Widgets nativos de WidgetKit.
+@available(*, deprecated, message: "La generación de wallpapers está fuera del alcance oficial de HabitLock.")
 @MainActor
 class WallpaperGenerator: ObservableObject {
     @Published var isGenerating: Bool = false

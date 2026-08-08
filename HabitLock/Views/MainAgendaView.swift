@@ -11,8 +11,6 @@ struct MainAgendaView: View {
     @State private var isZoomed: Bool = false
     @State private var showForm: Bool = false
     
-    @StateObject private var wallpaperGen = WallpaperGenerator()
-    
     var body: some View {
         ZStack {
             Color.creamWhite.ignoresSafeArea()
@@ -31,22 +29,10 @@ struct MainAgendaView: View {
                             .foregroundColor(.forestPine)
                     }
                     Spacer()
-                    
-                    Button(action: {
-                        wallpaperGen.generateAndSaveWallpaper(tasks: tasks) { success in
-                            if success {
-                                ShortcutLauncher.launchShortcut()
-                            }
-                        }
-                    }) {
-                        Image(systemName: "photo.on.rectangle.angled")
-                            .font(.system(size: 20))
-                            .foregroundColor(.forestPine)
-                    }
                 }
                 .padding()
                 
-                // Zona Templada (Visualizador semanal)
+                // Zona Templada (Visualizador semanal con indicadores de hábito)
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         ForEach(["Lunes 10", "Martes 11", "Miércoles 12", "Jueves 13", "Viernes 14", "Sábado 15", "Domingo 16"], id: \.self) { day in
@@ -56,7 +42,7 @@ struct MainAgendaView: View {
                                     isZoomed = true
                                 }
                             }) {
-                                VStack(spacing: 6) {
+                                VStack(spacing: 4) {
                                     Text(day.prefix(3).uppercased())
                                         .font(.system(size: 11, weight: .bold))
                                         .foregroundColor(day.contains("10") ? .forestPine : .secondary)
@@ -64,8 +50,13 @@ struct MainAgendaView: View {
                                     Text(day.components(separatedBy: " ").last ?? "")
                                         .font(.system(size: 16, weight: .semibold))
                                         .foregroundColor(day.contains("10") ? .forestPine : .primary)
+                                    
+                                    // Marcador de hábito (dot, ring, square)
+                                    Circle()
+                                        .fill(day.contains("10") ? Color.sageGreen : Color.clear)
+                                        .frame(width: 5, height: 5)
                                 }
-                                .frame(width: 54, height: 64)
+                                .frame(width: 54, height: 66)
                                 .background(day.contains("10") ? Color.eucalyptusMint.opacity(0.4) : Color.white)
                                 .cornerRadius(16)
                                 .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
@@ -106,9 +97,18 @@ struct MainAgendaView: View {
                                             .strikethrough(task.isCompleted, color: .sageGreen)
                                             .foregroundColor(task.isCompleted ? .sageGreen : .forestPine)
                                         
-                                        Text(task.category)
-                                            .font(HabitLockTypography.caption)
-                                            .foregroundColor(.secondary)
+                                        HStack(spacing: 6) {
+                                            if let habit = task.habit {
+                                                Text(habit.title)
+                                                    .font(HabitLockTypography.caption)
+                                                    .foregroundColor(.sageGreen)
+                                                    .bold()
+                                            } else {
+                                                Text(task.category)
+                                                    .font(HabitLockTypography.caption)
+                                                    .foregroundColor(.secondary)
+                                            }
+                                        }
                                     }
                                     
                                     Spacer()

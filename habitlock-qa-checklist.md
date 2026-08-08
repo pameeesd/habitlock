@@ -29,28 +29,27 @@ Este documento contiene el conjunto de casos de prueba (QA Checklist) diseñado 
 
 ---
 
-## Bloque 2: Regeneración de Fondos de Pantalla y Flujo Semiautomático
+## Bloque 2: Integración de Widgets en Pantalla de Bloqueo (`WidgetKit` & `AppIntents`)
 
-### Caso de Prueba 2.1: Generación de Imagen con ImageRenderer
-*   **Objetivo:** Comprobar que la vista de agenda y hábitos se capture a la resolución nativa correcta y se guarde en la galería de fotos sin pixelación [53, 55].
+### Caso de Prueba 2.1: Renderizado del Widget de Tareas en Lock Screen
+*   **Objetivo:** Comprobar que las tareas y hábitos agendados en SwiftData se muestren correctamente en el widget rectangular (`accessoryRectangular`) de la pantalla de bloqueo.
 *   **Procedimiento de Prueba:**
-    1. Añade múltiples tareas y hábitos para el día actual.
-    2. Presiona el botón "Guardar Fondo de Pantalla" dentro de la aplicación.
-    3. Abre la aplicación nativa "Fotos" de iOS y revisa la última imagen guardada.
+    1. Añade múltiples tareas y hábitos para el día actual en la app principal.
+    2. Agrega el widget de HabitLock a la pantalla de bloqueo.
+    3. Bloquea el dispositivo y enciende la pantalla.
 *   **Resultado Esperado:**
-    *   El sistema debe solicitar permiso de acceso de escritura a fotos con la alerta de privacidad declarada (`Privacy - Photo Library Additions Usage Description`) si es la primera vez [53].
-    *   La imagen guardada debe tener una relación de aspecto vertical (como 9:16) y coincidir con la resolución de pantalla del dispositivo de prueba (evitando estiramientos o márgenes negros) [53, 55].
-    *   El texto de la agenda en la foto guardada debe ser completamente nítido [55].
+    *   El widget debe mostrar las tareas ordenadas por fecha de vencimiento.
+    *   El marcador de hábito (dot, ring, square) debe ser visible junto a la categoría.
+    *   El texto de la tarea debe ser nítido y respetar los 45 caracteres máximos.
 
-### Caso de Prueba 2.2: Lanzamiento del Atajo del Sistema (Shortcuts)
-*   **Objetivo:** Verificar que el portapapeles se cargue de forma segura y el deep link de Atajos se ejecute de manera fluida [1, 11].
+### Caso de Prueba 2.2: Marcado Interactivo de Tareas desde el Widget (`ToggleTaskIntent`)
+*   **Objetivo:** Verificar que al tocar el botón interactivo del widget, la tarea se marque como completada en la base de datos compartida vía App Group.
 *   **Procedimiento de Prueba:**
-    1. Modifica la agenda en HabitLock para forzar la regeneración del fondo de pantalla.
-    2. Presiona "Establecer como Fondo".
+    1. Toca el botón de completado directamente en el widget de la pantalla de bloqueo.
+    2. Autentícate mediante FaceID/TouchID si el dispositivo lo requiere.
 *   **Resultado Esperado:**
-    *   La app debe copiar silenciosamente la nueva imagen generada por `ImageRenderer` al portapapeles del sistema (`UIPasteboard.general.image = image`) [1, 2].
-    *   La aplicación debe abrir de inmediato el esquema de URL `shortcuts://run-shortcut?name=HabitLockWallpaper&input=clipboard` [11].
-    *   El Atajo de iOS debe iniciarse y aplicar la imagen del portapapeles en la pantalla de bloqueo sin que el usuario tenga que seleccionarla manualmente de su galería [1, 11].
+    *   El widget se redibuja en tiempo real mostrando la tarea tachada con tono verde salvia.
+    *   Al abrir la App principal, la tarea refleja inmediatamente el estado `isCompleted = true`.
 
 ---
 

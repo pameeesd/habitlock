@@ -1,42 +1,23 @@
 import SwiftUI
 
-/// Vista de configuración e instrucciones para la integración con la app Atajos de iOS.
+/// Vista de configuración e instrucciones para la integración con Widgets de Pantalla de Bloqueo de iOS.
 struct SettingsView: View {
-    @State private var shortcutName: String = AppConstants.defaultShortcutName
     @ObservedObject var calendarManager = CalendarManager()
     
     var body: some View {
         NavigationStack {
             List {
-                Section("Integración con Lock Screen") {
+                Section("Integración con Lock Screen (Widgets)") {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Configuración del Atajo de iOS")
+                        Text("Cómo agregar Widgets a tu Pantalla de Bloqueo")
                             .font(.headline)
                             .foregroundColor(.forestPine)
                         
-                        Text("Para permitir que HabitLock actualice tu fondo de pantalla de bloqueo con un solo toque, crea un atajo en la app Atajos de Apple.")
+                        Text("1. Mantén presionada la pantalla de bloqueo de tu iPhone y pulsa 'Personalizar'.\n2. Toca el área de widgets e introduce 'HabitLock'.\n3. Elige el widget rectangular de tareas o el circular de progreso.")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
                     .padding(.vertical, 4)
-                    
-                    HStack {
-                        Text("Nombre del Atajo")
-                        Spacer()
-                        TextField("HabitLockWallpaper", text: $shortcutName)
-                            .multilineTextAlignment(.trailing)
-                            .foregroundColor(.sageGreen)
-                    }
-                    
-                    Button(action: {
-                        ShortcutLauncher.launchShortcut(named: shortcutName)
-                    }) {
-                        HStack {
-                            Image(systemName: "bolt.fill")
-                            Text("Probar Ejecución de Atajo")
-                        }
-                        .foregroundColor(.sageGreen)
-                    }
                 }
                 
                 Section("Permisos y Sincronización") {

@@ -27,27 +27,16 @@ struct Provider: TimelineProvider {
         completion(timeline)
     }
     
+    @MainActor
     private func fetchTasks() -> [HabitTask] {
-        guard let sharedContainerURL = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: AppConstants.appGroupIdentifier
-        ) else {
-            return []
-        }
+        let container = ModelContainer.sharedContainer
+        let context = container.mainContext
         
-        let storeURL = sharedContainerURL.appendingPathComponent(AppConstants.databaseFilename)
-        let config = ModelConfiguration(url: storeURL)
-        
-        do {
-            let container = try ModelContainer(for: Schema([HabitTask.self]), configurations: [config])
-            let context = ModelContext(container)
-            var fetchDescriptor = FetchDescriptor<HabitTask>(
-                sortBy: [SortDescriptor(\.dueDate, order: .forward)]
-            )
-            fetchDescriptor.fetchLimit = 3
-            return (try? context.fetch(fetchDescriptor)) ?? []
-        } catch {
-            return []
-        }
+        var fetchDescriptor = FetchDescriptor<HabitTask>(
+            sortBy: [SortDescriptor(\.dueDate, order: .forward)]
+        )
+        fetchDescriptor.fetchLimit = 3
+        return (try? context.fetch(fetchDescriptor)) ?? []
     }
 }
 

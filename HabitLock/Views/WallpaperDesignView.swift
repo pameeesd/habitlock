@@ -1,6 +1,8 @@
 import SwiftUI
 
-/// Vista plantilla en relación de aspecto 9:16 renderizada por ImageRenderer para generar el fondo de pantalla de bloqueo.
+/// [DEPRECATED / FUERA DE ALCANCE]
+/// Vista plantilla heredada para fondos de pantalla (excluida del alcance de HabitLock).
+@available(*, deprecated, message: "La generación de wallpapers está fuera del alcance de HabitLock.")
 struct WallpaperDesignView: View {
     let tasks: [HabitTask]
     

@@ -4,47 +4,38 @@ import SwiftData
 import Foundation
 
 /// App Intent interactivo para iOS 17 que permite marcar/desmarcar tareas directamente desde el Lock Screen Widget.
-struct ToggleTaskIntent: AppIntent {
-    static var title: LocalizedStringResource = "Completar Tarea en HabitLock"
+public struct ToggleTaskIntent: AppIntent {
+    public static var title: LocalizedStringResource = "Completar Tarea"
+    public static var description = IntentDescription("Marca una tarea como completada o pendiente directamente desde el Lock Screen.")
     
-    @Parameter(title: "ID de Tarea")
-    var taskId: UUID
+    @Parameter(title: "Task ID")
+    public var taskId: UUID
     
-    init() {}
+    public init() {}
     
-    init(taskId: UUID) {
+    public init(taskId: UUID) {
         self.taskId = taskId
     }
     
-    func perform() async throws -> some IntentResult {
-        guard let sharedContainerURL = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: AppConstants.appGroupIdentifier
-        ) else {
-            return .result()
-        }
+    @MainActor
+    public func perform() async throws -> some IntentResult {
+        let container = ModelContainer.sharedContainer
+        let context = container.mainContext
         
-        let storeURL = sharedContainerURL.appendingPathComponent(AppConstants.databaseFilename)
-        let config = ModelConfiguration(url: storeURL)
+        let targetId = taskId
+        let fetchDescriptor = FetchDescriptor<HabitTask>(
+            predicate: #Predicate { $0.id == targetId }
+        )
         
-        do {
-            let container = try ModelContainer(for: Schema([HabitTask.self]), configurations: [config])
-            let context = ModelContext(container)
-            
-            let fetchDescriptor = FetchDescriptor<HabitTask>()
-            if let allTasks = try? context.fetch(fetchDescriptor) {
-                if let taskToUpdate = allTasks.first(where: { $0.id == taskId }) {
-                    taskToUpdate.isCompleted.toggle()
-                    if taskToUpdate.isCompleted {
-                        taskToUpdate.streakCount += 1
-                    }
-                    try? context.save()
-                }
+        if let task = try context.fetch(fetchDescriptor).first {
+            task.isCompleted.toggle()
+            if task.isCompleted {
+                task.streakCount += 1
             }
+            try context.save()
             
             // Recargar timelines de los widgets en la pantalla de bloqueo
             WidgetCenter.shared.reloadAllTimelines()
-        } catch {
-            print("Error en perform() de ToggleTaskIntent: \(error)")
         }
         
         return .result()
