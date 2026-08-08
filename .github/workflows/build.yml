@@ -22,19 +22,22 @@ jobs:
         run: xcodebuild -version
 
       - name: Install XcodeGen
-        run: brew install xcodegen
+        run: brew install xcodegen || true
 
       - name: Generate Xcode Project
         run: xcodegen generate
 
-      - name: Build Unsigned iOS Archive
+      - name: Build Unsigned iOS App
         run: |
-          xcodebuild -project HabitLock.xcodeproj -scheme HabitLock -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO archive -archivePath build/HabitLock.xcarchive
+          xcodebuild -project HabitLock.xcodeproj -scheme HabitLock -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO SYMROOT=build build
 
       - name: Create Payload Folder for IPA
         run: |
           mkdir -p Payload
-          if [ -d "build/HabitLock.xcarchive/Products/Applications" ]; then
+          if [ -d "build/Release-iphoneos/HabitLock.app" ]; then
+            cp -r build/Release-iphoneos/HabitLock.app Payload/
+            zip -r HabitLock.ipa Payload
+          elif [ -d "build/HabitLock.xcarchive/Products/Applications" ]; then
             cp -r build/HabitLock.xcarchive/Products/Applications/*.app Payload/
             zip -r HabitLock.ipa Payload
           else
