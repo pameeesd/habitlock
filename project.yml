@@ -5,6 +5,12 @@ options:
     iOS: "17.0"
   xcodeVersion: "15.4"
 
+settings:
+  CODE_SIGNING_ALLOWED: NO
+  CODE_SIGNING_REQUIRED: NO
+  CODE_SIGN_IDENTITY: ""
+  DEVELOPMENT_TEAM: ""
+
 targets:
   HabitLock:
     type: application

@@ -3,7 +3,7 @@ import Foundation
 /// Constantes globales para la configuración del contenedor de seguridad y sincronizaciones.
 struct AppConstants {
     /// Identificador del App Group registrado en Apple Developer y Xcode.
-    static let appGroupIdentifier = "group.com.empresa.habitlock"
+    static let appGroupIdentifier = "group.com.tuempresa.habitlock"
     
     /// Nombre del archivo SQLite compartido entre App y Widget.
     static let databaseFilename = "HabitLockStore.sqlite"
