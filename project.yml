@@ -1,0 +1,28 @@
+name: HabitLock
+options:
+  bundleIdPrefix: com.tuempresa
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "15.4"
+
+targets:
+  HabitLock:
+    type: application
+    platform: iOS
+    sources:
+      - path: HabitLock
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.tuempresa.habitlock
+      INFOPLIST_FILE: HabitLock/Resources/Info.plist
+      GENERATE_INFOPLIST_FILE: false
+      SWIFT_VERSION: "5.0"
+
+  HabitLockWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: HabitLockWidget
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.tuempresa.habitlock.widget
+      GENERATE_INFOPLIST_FILE: true
+      SWIFT_VERSION: "5.0"

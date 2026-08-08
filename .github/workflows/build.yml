@@ -21,10 +21,15 @@ jobs:
       - name: Verify Xcode Version
         run: xcodebuild -version
 
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        run: xcodegen generate
+
       - name: Build Unsigned iOS Archive
         run: |
-          xcodebuild -workspace HabitLock.xcworkspace -scheme HabitLock -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO archive -archivePath build/HabitLock.xcarchive || \
-          xcodebuild -project HabitLock.xcodeproj -scheme HabitLock -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO archive -archivePath build/HabitLock.xcarchive || true
+          xcodebuild -project HabitLock.xcodeproj -scheme HabitLock -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO archive -archivePath build/HabitLock.xcarchive
 
       - name: Create Payload Folder for IPA
         run: |
