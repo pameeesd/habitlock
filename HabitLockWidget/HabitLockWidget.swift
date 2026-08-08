@@ -8,6 +8,7 @@ struct SimpleEntry: TimelineEntry {
 }
 
 struct Provider: TimelineProvider {
+    @MainActor
     func placeholder(in context: Context) -> SimpleEntry {
         SimpleEntry(date: Date(), tasks: [
             HabitTask(title: "Meditación matutina", isCompleted: false),
@@ -15,11 +16,13 @@ struct Provider: TimelineProvider {
         ])
     }
 
+    @MainActor
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
         let entry = SimpleEntry(date: Date(), tasks: fetchTasks())
         completion(entry)
     }
 
+    @MainActor
     func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> ()) {
         let entry = SimpleEntry(date: Date(), tasks: fetchTasks())
         let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: Date())!
