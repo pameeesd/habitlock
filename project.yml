@@ -28,7 +28,9 @@ targets:
       - path: HabitLock/Services
       - path: HabitLock/Theme
       - path: HabitLock/Intents
-      - path: HabitLock/App/AppConstants.swift
+      - path: HabitLock/App
+        excludes:
+          - "HabitLockApp.swift"
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.tuempresa.habitlock.widget
       GENERATE_INFOPLIST_FILE: true
