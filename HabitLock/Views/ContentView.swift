@@ -6,12 +6,12 @@ struct ContentView: View {
         TabView {
             MainAgendaView()
                 .tabItem {
-                    Label("Agenda", systemName: "calendar")
+                    Label("Agenda", systemImage: "calendar")
                 }
             
             SettingsView()
                 .tabItem {
-                    Label("Ajustes", systemName: "gearshape")
+                    Label("Ajustes", systemImage: "gearshape")
                 }
         }
         .tint(.sageGreen)

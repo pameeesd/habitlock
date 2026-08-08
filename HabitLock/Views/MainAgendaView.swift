@@ -68,14 +68,14 @@ struct MainAgendaView: View {
                 
                 // Zona Cálida (Lista de tareas e interacción con el pulgar)
                 List {
-                    Section("Pendientes de Hoy") {
-                        if tasks.isEmpty {
-                            ContentUnavailableView(
-                                "Sin Tareas Registradas",
-                                systemImage: "leaf",
-                                description: Text("Toca el botón + para agregar tu primer hábito o evento.")
-                            )
-                        } else {
+                    if tasks.isEmpty {
+                        ContentUnavailableView(
+                            "Sin Tareas Registradas",
+                            systemImage: "leaf",
+                            description: Text("Toca el botón + para agregar tu primer hábito o evento.")
+                        )
+                    } else {
+                        Section("Pendientes de Hoy") {
                             ForEach(tasks, id: \.id) { task in
                                 HStack {
                                     Button(action: {
@@ -128,7 +128,7 @@ struct MainAgendaView: View {
                                         modelContext.delete(task)
                                         try? modelContext.save()
                                     } label: {
-                                        Label("Eliminar", systemName: "trash")
+                                        Label("Eliminar", systemImage: "trash")
                                     }
                                 }
                             }
