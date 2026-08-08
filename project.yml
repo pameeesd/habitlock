@@ -19,8 +19,6 @@ targets:
       - path: HabitLock
         excludes:
           - "Resources/Info.plist"
-    dependencies:
-      - target: HabitLockWidget
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.tuempresa.habitlock
       INFOPLIST_FILE: HabitLock/Resources/Info.plist
