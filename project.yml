@@ -22,6 +22,7 @@ targets:
           - "Resources/Info.plist"
     dependencies:
       - target: HabitLockWidget
+        embed: true
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.tuempresa.habitlock
       INFOPLIST_FILE: HabitLock/Resources/Info.plist

@@ -7,6 +7,7 @@ struct HabitLockApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(.light)
         }
         .modelContainer(ModelContainer.sharedContainer)
     }

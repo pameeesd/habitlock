@@ -72,6 +72,20 @@ jobs:
             exit 1
           fi
 
+      - name: Diagnostic - List App Bundle Contents
+        run: |
+          echo "=== App Bundle Contents ==="
+          find build/Release-iphoneos/HabitLock.app -maxdepth 3 -type f -o -type d | head -50
+          echo "=== PlugIns Check ==="
+          if [ -d "build/Release-iphoneos/HabitLock.app/PlugIns/HabitLockWidget.appex" ]; then
+            echo "✅ HabitLockWidget.appex found in PlugIns"
+            ls -la build/Release-iphoneos/HabitLock.app/PlugIns/
+          else
+            echo "⚠️ HabitLockWidget.appex NOT found in PlugIns"
+            echo "Available PlugIns:"
+            ls -la build/Release-iphoneos/HabitLock.app/PlugIns/ 2>/dev/null || echo "No PlugIns directory"
+          fi
+
       - name: Package Diagnostic Unsigned IPA
         run: |
           mkdir -p Payload
