@@ -65,21 +65,6 @@ struct CustomGlassmorphicContainerView: View {
                                     .foregroundColor(task.isCompleted ? .sageGreen : .forestPine)
                                 
                                 Spacer()
-                                
-                                if task.streakCount > 0 {
-                                    HStack(spacing: 2) {
-                                        Image(systemName: "flame.fill")
-                                            .font(.system(size: 10))
-                                            .foregroundColor(.orange)
-                                        Text("\(task.streakCount)")
-                                            .font(HabitLockTypography.caption)
-                                            .foregroundColor(.forestPine.opacity(0.8))
-                                    }
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(Color.white.opacity(0.3))
-                                    .cornerRadius(8)
-                                }
                             }
                             .padding(8)
                             .background(Color.white.opacity(0.2))

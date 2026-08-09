@@ -156,9 +156,6 @@ struct MainAgendaView: View {
                                 HStack {
                                     Button(action: {
                                         task.isCompleted.toggle()
-                                        if task.isCompleted {
-                                            task.streakCount += 1
-                                        }
                                         try? modelContext.save()
                                     }) {
                                         Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
@@ -188,16 +185,6 @@ struct MainAgendaView: View {
                                     }
                                     
                                     Spacer()
-                                    
-                                    if task.streakCount > 0 {
-                                        HStack(spacing: 2) {
-                                            Image(systemName: "flame.fill")
-                                                .font(.system(size: 12))
-                                                .foregroundColor(.orange)
-                                            Text("\(task.streakCount)")
-                                                .font(HabitLockTypography.caption)
-                                        }
-                                    }
                                 }
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                     Button(role: .destructive) {

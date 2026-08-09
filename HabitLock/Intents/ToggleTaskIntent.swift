@@ -36,9 +36,6 @@ public struct ToggleTaskIntent: AppIntent {
         
         if let task = try context.fetch(fetchDescriptor).first {
             task.isCompleted.toggle()
-            if task.isCompleted {
-                task.streakCount += 1
-            }
             try context.save()
             
             // Recargar timelines de los widgets en la pantalla de bloqueo
