@@ -72,6 +72,70 @@ jobs:
             exit 1
           fi
 
+      - name: Diagnostic - Widget Extension Audit
+        run: |
+          APPEX="build/Release-iphoneos/HabitLock.app/PlugIns/HabitLockWidget.appex"
+          APP="build/Release-iphoneos/HabitLock.app"
+          
+          echo "=== App Bundle Contents ==="
+          find "$APP" -maxdepth 3 -type f -o -type d | sort
+          
+          echo ""
+          echo "=== PlugIns Check ==="
+          if [ -d "$APPEX" ]; then
+            echo "✅ HabitLockWidget.appex found in PlugIns"
+            ls -la "$APP/PlugIns/"
+          else
+            echo "⚠️ HabitLockWidget.appex NOT found in PlugIns"
+            ls -la "$APP/PlugIns/" 2>/dev/null || echo "No PlugIns directory"
+            exit 0
+          fi
+          
+          echo ""
+          echo "=== App Info.plist (Bundle ID) ==="
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Info.plist" 2>/dev/null || echo "Could not read App Bundle ID"
+          
+          echo ""
+          echo "=== Widget Info.plist (Full) ==="
+          /usr/libexec/PlistBuddy -c "Print" "$APPEX/Info.plist" 2>/dev/null || plutil -p "$APPEX/Info.plist" 2>/dev/null || echo "Could not read Widget Info.plist"
+          
+          echo ""
+          echo "=== Widget Bundle Identifier ==="
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APPEX/Info.plist" 2>/dev/null || echo "NOT FOUND"
+          
+          echo ""
+          echo "=== Widget NSExtension ==="
+          /usr/libexec/PlistBuddy -c "Print :NSExtension" "$APPEX/Info.plist" 2>/dev/null || echo "NOT FOUND"
+          
+          echo ""
+          echo "=== Widget NSExtensionPointIdentifier ==="
+          /usr/libexec/PlistBuddy -c "Print :NSExtension:NSExtensionPointIdentifier" "$APPEX/Info.plist" 2>/dev/null || echo "NOT FOUND"
+          
+          echo ""
+          echo "=== Widget Architecture ==="
+          file "$APPEX/HabitLockWidget" 2>/dev/null || echo "Binary not found"
+          lipo -info "$APPEX/HabitLockWidget" 2>/dev/null || echo "Could not read architecture info"
+          
+          echo ""
+          echo "=== Widget Codesign Status ==="
+          codesign -dvvv "$APPEX" 2>&1 || echo "Not signed (expected for unsigned build)"
+          
+          echo ""
+          echo "=== App Codesign Status ==="
+          codesign -dvvv "$APP" 2>&1 || echo "Not signed (expected for unsigned build)"
+          
+          echo ""
+          echo "=== Bundle ID Hierarchy Check ==="
+          APP_BUNDLE_ID=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Info.plist" 2>/dev/null)
+          WIDGET_BUNDLE_ID=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APPEX/Info.plist" 2>/dev/null)
+          echo "App Bundle ID:    $APP_BUNDLE_ID"
+          echo "Widget Bundle ID: $WIDGET_BUNDLE_ID"
+          if [[ "$WIDGET_BUNDLE_ID" == "$APP_BUNDLE_ID"* ]]; then
+            echo "✅ Widget Bundle ID is a child of App Bundle ID"
+          else
+            echo "⚠️ Widget Bundle ID is NOT a child of App Bundle ID — this may prevent iOS from loading the extension"
+          fi
+
       - name: Package Diagnostic Unsigned IPA
         run: |
           mkdir -p Payload
